@@ -1,33 +1,53 @@
 # Desku.be - Virtual Desktop and Game Streaming in Kubernetes
 
-This project provides a proof-of-concept implementation for running desktop environments inside Kubernetes containers.
+This proof-of-concept implements a virtual Wayland display inside a container that can capture and stream graphical content over the network using GStreamer's pipeline architecture. 
+
+The demo showcases rendering weston-simple-egl (a spinning cube OpenGL demo) and streaming it to a remote client.
 
 ## Components
 
-- **run-wayland-display.sh**: Sets up a virtual Wayland display using GStreamer
-- **Dockerfile**: Container definition with all necessary components
+- **start.sh**: Sets up a virtual Wayland display using GStreamer and runs weston-simple-egl demo
+- **Dockerfile**: Container definition with all necessary components (GStreamer, Wayland, Weston)
 - **stream-base-*.yaml**: Kubernetes manifests for deployment
 
 ## Architecture
 
-- **Virtual Display Layer**: Uses GStreamer's waylanddisplaysrc to create a virtual Wayland display
-- **Application Layer**: Applications run inside the container and render to the virtual display
-- **Streaming Layer**: Sunshine captures the display and streams it to remote clients
-- **Kubernetes Layer**: MetalLB provides external access to the streaming services
+- **Virtual Display Layer**: Uses GStreamer's waylanddisplaysrc to create a virtual Wayland display without requiring real hardware
+- **Application Layer**: The weston-simple-egl demo application runs inside the container and renders to the virtual Wayland display
+- **Streaming Layer**: GStreamer captures the Wayland display content and streams it via RTP/UDP to remote clients
 
-## Deploy streamer
+## Running the Demo
+
+### Deploy streamer in Kubernetes
 
 ```bash
 ./deploy-stream-base.sh
 ```
 
-## Receiver command
+The `start.sh` script:
+
+1. Creates a virtual Wayland display using GStreamer's waylanddisplaysrc
+2. Starts weston-simple-egl demo in a tmux window
+3. Streams the rendered content via RTP/UDP
+
+### Receiver command
+
+To view the stream on a remote machine, run:
 
 ```bash
 gst-launch-1.0 -v udpsrc port=5000 caps="application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)RAW, sampling=(string)RGB, depth=(string)8, width=(string)1920, height=(string)1080" ! rtpvrawdepay ! videoconvert ! autovideosink
 ```
 
-## Working with private registry
+This will display the weston-simple-egl demo (spinning cube) that's being rendered inside the container.
+
+## Building the Container(s)
+
+The container build process use OpenShift BuildConfigs.
+It can be triggered via the ```./build.sh``` scripts.
+
+### Working with private registry
+
+If you're deploying to OpenShift or another Kubernetes environment with a private registry:
 
 ```bash
 oc create secret generic registry-pull-secret --from-file=.dockerconfigjson=/tmp/new-pull-secret.json --type=kubernetes.io/dockerconfigjson
