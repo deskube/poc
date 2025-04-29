@@ -4,8 +4,6 @@ set -e
 # Set up environment variables for GStreamer and NVIDIA
 export GST_PLUGIN_PATH=/usr/local/lib64/gstreamer-1.0:/local/lib64/gstreamer-1.0
 export GST_DEBUG=3
-export NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
-export NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-compute,video,graphics,utility}
 
 # Make sure XDG_RUNTIME_DIR is set and the directory exists
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp/xdg-runtime-dir}
@@ -34,7 +32,7 @@ echo "Setting up virtual Wayland display using waylanddisplaysrc..."
 # Start GStreamer waylanddisplaysrc in tmux first window - this will create the Wayland display
 echo "Starting GStreamer waylanddisplaysrc to create Wayland display in tmux window..."
 tmux send-keys -t wayland-streaming:0 "echo 'Starting GStreamer waylanddisplaysrc...'" C-m
-tmux send-keys -t wayland-streaming:0 "GST_PLUGIN_PATH=/usr/local/lib64/gst-launch-1.0 -v waylanddisplaysrc render-node=software ! 'video/x-raw,width=1920,height=1080,format=RGBx,framerate=60/1' ! videoconvert ! video/x-raw,format=RGB ! rtpvrawpay ! udpsink host=$RECEIVER_IP port=5000" C-m
+tmux send-keys -t wayland-streaming:0 "GST_PLUGIN_PATH=/usr/local/lib64/gstreamer-1.0 gst-launch-1.0 -v waylanddisplaysrc render-node=software ! 'video/x-raw,width=1920,height=1080,format=RGBx,framerate=60/1' ! videoconvert ! video/x-raw,format=RGB ! rtpvrawpay ! udpsink host=$RECEIVER_IP port=5000" C-m
 
 # Give it time to create the socket
 sleep 3
