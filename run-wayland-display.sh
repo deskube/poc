@@ -56,58 +56,39 @@ echo "Starting Weston as a Wayland client..."
 export XDG_DATA_DIRS=/usr/local/share:/usr/share
 export WAYLAND_DEBUG=1
 
-# Start Weston with support for required protocols in tmux window 1
-tmux new-window -t wayland-streaming:1
-tmux send-keys -t wayland-streaming:1 "echo 'Starting Weston as a Wayland client...'" C-m
-tmux send-keys -t wayland-streaming:1 "export XDG_DATA_DIRS=/usr/local/share:/usr/share" C-m
-tmux send-keys -t wayland-streaming:1 "export WAYLAND_DEBUG=1" C-m
-tmux send-keys -t wayland-streaming:1 "export WAYLAND_DISPLAY=wayland-1" C-m
-tmux send-keys -t wayland-streaming:1 "weston --backend=headless-backend.so --socket=wayland-1" C-m
-sleep 3
-
-# Start the weston-simple-egl demo in tmux window 2
+# Start the weston-simple-egl demo in tmux window 1
 echo "Starting weston-simple-egl demo..."
-tmux new-window -t wayland-streaming:2
-tmux send-keys -t wayland-streaming:2 "echo 'Starting weston-simple-egl demo...'" C-m
-tmux send-keys -t wayland-streaming:2 "export WAYLAND_DISPLAY=wayland-1" C-m
-tmux send-keys -t wayland-streaming:2 "weston-simple-egl" C-m
+tmux new-window -t wayland-streaming:1
+tmux send-keys -t wayland-streaming:1 "echo 'Starting weston-simple-egl demo...'" C-m
+tmux send-keys -t wayland-streaming:1 "export WAYLAND_DISPLAY=wayland-1" C-m
+tmux send-keys -t wayland-streaming:1 "weston-simple-egl" C-m
 sleep 2
 
-# Wait a moment to ensure everything is running
-sleep 3
+# Start Sunshine in tmux window 2
+echo "Starting Sunshine in tmux window 2..."
+tmux new-window -t wayland-streaming:2
+tmux send-keys -t wayland-streaming:2 "echo 'Starting Sunshine...'" C-m
+tmux send-keys -t wayland-streaming:2 "export XDG_SESSION_TYPE=wayland" C-m
+tmux send-keys -t wayland-streaming:2 "export WAYLAND_DISPLAY=wayland-1" C-m
+tmux send-keys -t wayland-streaming:2 "export XDG_DATA_DIRS=/usr/local/share:/usr/share" C-m
+tmux send-keys -t wayland-streaming:2 "export WLR_NO_HARDWARE_CURSORS=1" C-m
+tmux send-keys -t wayland-streaming:2 "sunshine" C-m
+sleep 2
+
 echo "Wayland display environment setup successfully"
 
 # Create a window for process monitoring
 tmux new-window -t wayland-streaming:3
-tmux send-keys -t wayland-streaming:3 "watch -n 1 'ps aux | grep -E \"weston|simple-egl|wayland|gst-launch\" | grep -v grep'" C-m
+tmux send-keys -t wayland-streaming:3 "watch -n 1 'ps aux | grep -E \"weston|simple-egl|wayland|gst-launch|sunshine\" | grep -v grep'" C-m
 
 # Show tmux status and instructions
 echo -e "\nTMUX sessions are running with the following windows:"
 echo "  0: GStreamer waylanddisplaysrc"
-echo "  1: Weston Wayland compositor"
-echo "  2: weston-simple-egl demo"
+echo "  1: Weston-simple-egl demo"
+echo "  2: Sunshine"
 echo "  3: Process monitoring"
 echo -e "\nYou can attach to these sessions with: tmux attach-session -t wayland-streaming"
-echo "Navigate between windows with: Ctrl+b <window number>"
-echo "Detach from tmux with: Ctrl+b d"
-
-# Keep the script running until tmux session ends
-tmux wait-for wayland-streaming
-
-# Let Sunshine know everything is ready
 echo "Virtual Wayland display is ready for Sunshine"
-
-# Show tmux status and instructions
-echo -e "\nTMUX sessions are running with the following windows:"
-echo "  0: GStreamer waylanddisplaysrc"
-echo "  1: Weston Wayland compositor"
-echo "  2: Sway (for wlr-export-dmabuf protocol)"
-echo "  3: Weston Terminal (visible app)"
-echo "  4: Sunshine logs"
-echo "  5: Process monitoring"
-echo -e "\nYou can attach to these sessions with: tmux attach-session -t wayland-streaming"
-echo "Navigate between windows with: Ctrl+b <window number>"
-echo "Detach from tmux with: Ctrl+b d"
 
 # Keep the script running until tmux session ends
 tmux wait-for wayland-streaming

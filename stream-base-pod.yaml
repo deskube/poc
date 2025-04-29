@@ -36,9 +36,6 @@ spec:
       protocol: TCP
     securityContext:
       privileged: true
-    command:
-      - sleep
-      - "infinity"
     env:
     - name: NVIDIA_VISIBLE_DEVICES
       value: "all"
