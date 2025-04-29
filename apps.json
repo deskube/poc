@@ -7,14 +7,8 @@
   },
   "apps": [
     {
-      "name": "Weston Terminal",
-      "cmd": "WAYLAND_DISPLAY=wayland-1 weston-terminal --maximize",
-      "image-path": "/usr/share/sunshine/assets/desktop.png",
-      "detached": true
-    },
-    {
-      "name": "GStreamer Test Pattern",
-      "cmd": "WAYLAND_DISPLAY=wayland-1 gst-launch-1.0 videotestsrc ! waylandsink",
+      "name": "weston-simple-egl",
+      "cmd": "WAYLAND_DISPLAY=wayland-1 weston-simple-egl",
       "image-path": "/usr/share/sunshine/assets/desktop.png",
       "detached": true
     }

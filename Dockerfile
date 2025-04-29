@@ -56,54 +56,18 @@ RUN chmod +x /local/bin/run-wayland-display.sh
 RUN dnf install -y \
    mesa-dri-drivers mesa-libGL mesa-libEGL mesa-libGLES \
    libdrm libdrm-devel \
-   weston weston-libs xorg-x11-server-Xwayland \
+   weston weston-libs weston-examples \
    tmux procps-ng \
-   sway xdg-desktop-portal-wlr wayland-protocols-devel \
-   cmake vulkan-headers vulkan-loader vulkan-tools vulkan-validation-layers \
-   # Install wlroots and development packages
-   wlroots wlroots-devel \
-   # Install latest version available
-   wlroots0.17 wlroots0.17-devel
+   wayland-protocols-devel
 
-# Install wlr-protocols for the export-dmabuf protocol
-RUN git clone https://github.com/swaywm/wlr-protocols.git && \
-    mkdir -p /usr/share/wayland-protocols/ && \
-    cp -r wlr-protocols/* /usr/share/wayland-protocols/ && \
-    cd / && \
-    # Make sure we're using the latest wlroots library
-    ln -sf /usr/lib64/libwlroots.so.* /usr/lib64/libwlroots.so
-
-# Install Sunshine streaming server from COPR repository
-RUN dnf copr enable -y lizardbyte/stable && \
-    dnf install -y Sunshine udev fuse fuse-libs xdpyinfo && \
-    # Create required directories
-    mkdir -p /dev/input && \
-    mkdir -p /sunshine && \
-    mkdir -p /local/bin && \
+# Create required directories
+RUN mkdir -p /local/bin && \
     mkdir -p /local/lib64/gstreamer-1.0 && \
-    # Copy udev rules but don't try to reload (containers don't use udev)
-    mkdir -p /etc/udev/rules.d && \
-    echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"' > /etc/udev/rules.d/85-sunshine.rules && \
-    echo 'KERNEL=="uhid", TAG+="uaccess"' >> /etc/udev/rules.d/85-sunshine.rules && \
     # Create a default weston.ini config
     mkdir -p /root/.config/weston
 
 # Add weston configuration
 COPY weston.ini /root/.config/weston/weston.ini
 
-# Add sunshine configuration script
-COPY start-sunshine.sh /local/bin/
-RUN chmod +x /local/bin/start-sunshine.sh
-
-# Set entrypoint to show plugin info and provide usage instructions
-# Create apps.json file for Sunshine
-COPY apps.json /sunshine/apps.json
-
-# Add volumes for configuration
-VOLUME /sunshine
-
-# Expose Sunshine ports
-EXPOSE 47984/tcp 47989/tcp 48010/tcp 47998/udp 47999/udp 48000/udp 48002/udp 48010/udp 47990/tcp
-
-# Set entrypoint to run Sunshine with the Wayland display source
-ENTRYPOINT ["/bin/bash", "-c", "echo 'Wayland Display Streamer with Sunshine and NVIDIA GPU support'; echo 'Plugin location:' && find / -name 'libgstwaylanddisplaysrc.so' 2>/dev/null; echo 'Starting Sunshine streaming server...'; /local/bin/start-sunshine.sh"]
+# Set entrypoint to run the Wayland display with weston-simple-egl demo
+ENTRYPOINT ["/bin/bash", "-c", "echo 'Wayland Display with weston-simple-egl demo'; echo 'Plugin location:' && find / -name 'libgstwaylanddisplaysrc.so' 2>/dev/null; echo 'Starting Wayland environment...'; /local/bin/run-wayland-display.sh"]

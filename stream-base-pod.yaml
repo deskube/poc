@@ -11,6 +11,7 @@ spec:
   containers:
   - name: stream-base
     image: "registry.desku.be/deskube/streamer-base:latest"
+    imagePullPolicy: Always
     ports:
     - name: rtp1
       containerPort: 48100
