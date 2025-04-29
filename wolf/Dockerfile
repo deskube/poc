@@ -19,7 +19,8 @@ RUN dnf install -y \
     libunwind-devel \
     systemd-devel \
     libdrm-devel \
-    pciutils-devel && \
+    pciutils-devel \
+    wayland-protocols && \
     dnf clean all
 
 # Clone Wolf source code
