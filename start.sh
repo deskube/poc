@@ -47,29 +47,35 @@ fi
 
 echo "Wayland socket is available at $XDG_RUNTIME_DIR/wayland-1"
 
-# Now start Weston as a client to the existing Wayland display
-echo "Starting Weston as a Wayland client..."
+# Now start Sway as a client to the existing Wayland display
+echo "Starting Sway window manager..."
 
 # Export protocol paths to ensure they're found
 export XDG_DATA_DIRS=/usr/local/share:/usr/share
 export WAYLAND_DEBUG=1
 
-# Start the weston-simple-egl demo in tmux window 1
-echo "Starting weston-simple-egl demo..."
+# Copy the Sway configuration file to the user's config directory
+mkdir -p $HOME/.config/sway
+cp /local/bin/sway-config $HOME/.config/sway/config
+
+# Start Sway window manager in tmux window 1
+echo "Starting Sway window manager..."
 tmux new-window -t wayland-streaming:1
-tmux send-keys -t wayland-streaming:1 "echo 'Starting weston-simple-egl demo...'" C-m
+tmux send-keys -t wayland-streaming:1 "echo 'Starting Sway window manager...'" C-m
 tmux send-keys -t wayland-streaming:1 "export WAYLAND_DISPLAY=wayland-1" C-m
-tmux send-keys -t wayland-streaming:1 "weston-simple-egl" C-m
-sleep 2
+tmux send-keys -t wayland-streaming:1 "export WLR_BACKENDS=headless" C-m  
+tmux send-keys -t wayland-streaming:1 "export WLR_RENDERER=pixman" C-m
+tmux send-keys -t wayland-streaming:1 "sway --config $HOME/.config/sway/config" C-m
+sleep 4
 
 echo "Wayland display environment setup successfully"
 
 # Show tmux status and instructions
 echo -e "\nTMUX sessions are running with the following windows:"
 echo "  0: GStreamer waylanddisplaysrc"
-echo "  1: Weston-simple-egl demo"
+echo "  1: Sway window manager"
 echo -e "\nYou can attach to these sessions with: tmux attach-session -t wayland-streaming"
-echo "Virtual Wayland display is ready"
+echo "Virtual Wayland display with Sway window manager is ready"
 
 # Keep the script running until tmux session ends
 tmux wait-for wayland-streaming

@@ -1,0 +1,42 @@
+# Default sway config for desku.be container
+# Basic Sway configuration for headless streaming setup
+
+# Set default terminal
+set $term foot
+
+# Default mod key (Mod4 = Super/Windows key)
+set $mod Mod4
+
+# Appearance
+default_border pixel 2
+gaps inner 8
+gaps outer 2
+
+# Status bar
+bar {
+    position top
+    status_command i3status
+}
+
+# Autostart applications
+exec_always {
+    foot -e sh -c "echo 'Desku.be - Virtual Desktop in Kubernetes' && sleep infinity"
+}
+
+# Disable idle inhibitors since this is a streaming environment
+exec swayidle -w timeout 0 ''
+
+# Basic keybindings
+bindsym $mod+Return exec $term
+bindsym $mod+d exec dmenu_run
+bindsym $mod+q kill
+bindsym $mod+f fullscreen
+bindsym $mod+Shift+c reload
+
+# Needed for waylanddisplaysrc
+output "HEADLESS-1" {
+    # Fill the entire rendering area
+    mode 1920x1080
+    scale 1
+    bg #333333 solid_color
+}

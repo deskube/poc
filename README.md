@@ -2,18 +2,19 @@
 
 This proof-of-concept implements a virtual Wayland display inside a container that can capture and stream graphical content over the network using GStreamer's pipeline architecture. 
 
-The demo showcases rendering weston-simple-egl (a spinning cube OpenGL demo) and streaming it to a remote client.
+The demo showcases running the Sway window manager inside a container and streaming it to a remote client.
 
 ## Components
 
-- **start.sh**: Sets up a virtual Wayland display using GStreamer and runs weston-simple-egl demo
-- **Dockerfile**: Container definition with all necessary components (GStreamer, Wayland, Weston)
+- **start.sh**: Sets up a virtual Wayland display using GStreamer and runs the Sway window manager
+- **sway-config**: Configuration file for the Sway window manager
+- **Dockerfile**: Container definition with all necessary components (GStreamer, Wayland, Sway)
 - **stream-base-*.yaml**: Kubernetes manifests for deployment
 
 ## Architecture
 
 - **Virtual Display Layer**: Uses GStreamer's waylanddisplaysrc to create a virtual Wayland display without requiring real hardware
-- **Application Layer**: The weston-simple-egl demo application runs inside the container and renders to the virtual Wayland display
+- **Application Layer**: The Sway window manager runs inside the container and renders to the virtual Wayland display
 - **Streaming Layer**: GStreamer captures the Wayland display content and streams it via RTP/UDP to remote clients
 
 ## Running the Demo
@@ -27,7 +28,7 @@ The demo showcases rendering weston-simple-egl (a spinning cube OpenGL demo) and
 The `start.sh` script:
 
 1. Creates a virtual Wayland display using GStreamer's waylanddisplaysrc
-2. Starts weston-simple-egl demo in a tmux window
+2. Starts the Sway window manager in a tmux window
 3. Streams the rendered content via RTP/UDP
 
 ### Receiver command
@@ -38,7 +39,7 @@ To view the stream on a remote machine, run:
 gst-launch-1.0 -v udpsrc port=5000 caps="application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)RAW, sampling=(string)RGB, depth=(string)8, width=(string)1920, height=(string)1080" ! rtpvrawdepay ! videoconvert ! autovideosink
 ```
 
-This will display the weston-simple-egl demo (spinning cube) that's being rendered inside the container.
+This will display the Sway window manager interface that's being rendered inside the container.
 
 ## Building the Container(s)
 
