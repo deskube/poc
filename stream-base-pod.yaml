@@ -11,6 +11,13 @@ spec:
   - name: stream-base
     image: "registry.desku.be/deskube/streamer-base:latest"
     imagePullPolicy: Always
+    # Add security context for privileged mode
+    securityContext:
+      privileged: true
+      capabilities:
+        add:
+          - SYS_ADMIN
+          - NET_ADMIN
     env:
     - name: RECEIVER_IP
       valueFrom:

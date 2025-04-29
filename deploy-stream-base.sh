@@ -13,6 +13,8 @@ fi
 
 oc project $NAMESPACE
 
+oc adm policy add-scc-to-user privileged -z default -n $NAMESPACE
+
 echo "======= Deploying Stream Base ConfigMap ======="
 # Check if RECEIVER_IP is defined, if not set default value
 if [ -z "${RECEIVER_IP}" ]; then
