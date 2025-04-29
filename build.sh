@@ -50,7 +50,7 @@ fi
 
 
 # Get the latest build name
-BUILD_NAME="${BC_NAME}-$(oc get builds --sort-by=.metadata.creationTimestamp -o name | grep "${BC_NAME}" | tail -1 | awk -F/ '{print $2}')"
+BUILD_NAME="$(oc get builds --sort-by=.metadata.creationTimestamp -o name | grep "${BC_NAME}" | tail -1 | awk -F/ '{print $2}')"
 echo "Build started: ${BUILD_NAME}"
 
 # Follow the logs separately
