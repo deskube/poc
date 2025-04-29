@@ -29,11 +29,11 @@ RUN git clone https://github.com/games-on-whales/wolf.git
 WORKDIR /usr/src/wolf
 
 # Apply fix for the get_port function that's missing a return value
-RUN sed -i 's/int get_port(STANDARD_PORTS_MAPPING port_type) {/int get_port(STANDARD_PORTS_MAPPING port_type) {\n    return 0; \/\/ Default return value/' src/moonlight-server/state/data-structures.hpp
+# RUN sed -i 's/int get_port(STANDARD_PORTS_MAPPING port_type) {/int get_port(STANDARD_PORTS_MAPPING port_type) {\n    return 0; \/\/ Default return value/' src/moonlight-server/state/data-structures.hpp
 
 # Build wolf
-RUN cmake -Bbuild -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_EXTENSIONS=OFF -G Ninja
-RUN ninja -C build
+# RUN cmake -Bbuild -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_EXTENSIONS=OFF -G Ninja
+# RUN ninja -C build
 
 # Copy the run script
 COPY runwolf.sh /usr/local/bin/runwolf.sh
