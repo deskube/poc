@@ -1,9 +1,5 @@
 FROM registry.desku.be/deskube/gst-wayland-display:latest
 
-# Set NVIDIA GPU information and create wrapper script for Wayland display
-COPY run-wayland-display.sh /local/bin/
-RUN chmod +x /local/bin/run-wayland-display.sh
-
 RUN dnf install -y \
    weston-simple-egl \
    tmux procps-ng
