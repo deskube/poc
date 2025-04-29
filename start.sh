@@ -63,7 +63,6 @@ echo "Starting Sway window manager..."
 tmux new-window -t wayland-streaming:1
 tmux send-keys -t wayland-streaming:1 "echo 'Starting Sway window manager...'" C-m
 tmux send-keys -t wayland-streaming:1 "export WAYLAND_DISPLAY=wayland-1" C-m
-tmux send-keys -t wayland-streaming:1 "export WLR_BACKENDS=headless" C-m  
 tmux send-keys -t wayland-streaming:1 "export WLR_RENDERER=pixman" C-m
 tmux send-keys -t wayland-streaming:1 "sway --config $HOME/.config/sway/config" C-m
 sleep 4
