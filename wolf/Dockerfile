@@ -20,7 +20,7 @@ RUN dnf install -y \
     systemd-devel \
     libdrm-devel \
     pciutils-devel \
-    wayland-protocols && \
+    wayland-protocols-devel && \
     dnf clean all
 
 # Clone Wolf source code
