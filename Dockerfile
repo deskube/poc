@@ -56,7 +56,7 @@ RUN chmod +x /local/bin/run-wayland-display.sh
 RUN dnf install -y \
    mesa-dri-drivers mesa-libGL mesa-libEGL mesa-libGLES \
    libdrm libdrm-devel \
-   weston weston-libs weston-examples \
+   weston weston-libs weston-simple-egl \
    tmux procps-ng \
    wayland-protocols-devel
 

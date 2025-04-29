@@ -18,30 +18,35 @@ REGISTRY_IMAGE="${REGISTRY}/deskube/${FULL_IMAGE}"
 
 echo "Building and pushing ${REGISTRY_IMAGE} from repository ${GIT_REPO} (branch: ${GIT_BRANCH})"
 
-# Always clean up the old BuildConfig and ImageStream to avoid any configuration issues
-echo "Removing any existing BuildConfig and ImageStream for ${BC_NAME}..."
-oc delete bc "${BC_NAME}" --ignore-not-found=true
-oc delete is "${BC_NAME}" --ignore-not-found=true
+# Check if BuildConfig already exists
+if oc get bc "${BC_NAME}" &>/dev/null; then
+  echo "BuildConfig ${BC_NAME} already exists, starting a new build..."
+  # Start a new build from the existing BuildConfig
+  oc start-build "${BC_NAME}"
+else
+  echo "BuildConfig ${BC_NAME} does not exist, creating a new one..."
 
-# Create a fresh BuildConfig with minimal options
-echo "Creating new BuildConfig ${BC_NAME}..."
+  # Clean up any potential leftover ImageStream to avoid configuration issues
+  echo "Removing any existing ImageStream for ${BC_NAME}..."
+  oc delete is "${BC_NAME}" --ignore-not-found=true
 
-# For Git-based builds, we'll use the repository URL as the source
-echo "Creating build config with registry: ${REGISTRY_IMAGE} from ${GIT_REPO}"
+  # For Git-based builds, we'll use the repository URL as the source
+  echo "Creating build config with registry: ${REGISTRY_IMAGE} from ${GIT_REPO}"
 
-# Ensure the builder service account exists and has the right permissions
-echo "Checking and setting up the builder service account..."
-oc get sa builder || oc create sa builder
-oc adm policy add-cluster-role-to-user system:image-builder -z builder || true
-oc adm policy add-role-to-user system:image-pusher -z builder || true
+  # Ensure the builder service account exists and has the right permissions
+  echo "Checking and setting up the builder service account..."
+  oc get sa builder || oc create sa builder
+  oc adm policy add-cluster-role-to-user system:image-builder -z builder || true
+  oc adm policy add-role-to-user system:image-pusher -z builder || true
 
-# Create the build config with the service account specified
-oc new-build \
-  --name="${BC_NAME}" \
-  "${GIT_REPO}#${GIT_BRANCH}" \
-  --to="${REGISTRY_IMAGE}" \
-  --strategy=docker \
-  --to-docker=true
+  # Create the build config with the service account specified
+  oc new-build \
+    --name="${BC_NAME}" \
+    "${GIT_REPO}#${GIT_BRANCH}" \
+    --to="${REGISTRY_IMAGE}" \
+    --strategy=docker \
+    --to-docker=true
+fi
 
 
 # Get the latest build name
