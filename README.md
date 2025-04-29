@@ -57,6 +57,13 @@ spec:
   - ip-addresspool
 ```
 
+## Working with private registry
+
+```bash
+oc create secret generic registry-pull-secret --from-file=.dockerconfigjson=/tmp/new-pull-secret.json --type=kubernetes.io/dockerconfigjson
+oc secrets link builder registry-pull-secret --for=pull,mount
+```
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0. 

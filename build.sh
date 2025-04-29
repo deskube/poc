@@ -28,6 +28,14 @@ echo "Creating new BuildConfig ${BC_NAME}..."
 
 # For Git-based builds, we'll use the repository URL as the source
 echo "Creating build config with registry: ${REGISTRY_IMAGE} from ${GIT_REPO}"
+
+# Ensure the builder service account exists and has the right permissions
+echo "Checking and setting up the builder service account..."
+oc get sa builder || oc create sa builder
+oc adm policy add-cluster-role-to-user system:image-builder -z builder || true
+oc adm policy add-role-to-user system:image-pusher -z builder || true
+
+# Create the build config with the service account specified
 oc new-build \
   --name="${BC_NAME}" \
   "${GIT_REPO}#${GIT_BRANCH}" \
@@ -35,20 +43,25 @@ oc new-build \
   --strategy=docker \
   --to-docker=true
 
-# Start the build and follow the logs
-echo "Starting build from Git repository..."
-BUILD_NAME=$(oc start-build "${BC_NAME}" --follow)
+
+# Get the latest build name
+BUILD_NAME="${BC_NAME}-$(oc get builds --sort-by=.metadata.creationTimestamp -o name | grep "${BC_NAME}" | tail -1 | awk -F/ '{print $2}')"
 echo "Build started: ${BUILD_NAME}"
 
+# Follow the logs separately
+echo "Following build logs..."
+oc logs -f "build/${BUILD_NAME}" || true
+
 # Final verification
-FINAL_STATUS=$(oc get "${BUILD_NAME}" -o jsonpath='{.status.phase}')
+echo "Checking final build status..."
+FINAL_STATUS=$(oc get "build/${BUILD_NAME}" -o jsonpath='{.status.phase}')
 if [[ "$FINAL_STATUS" != "Complete" ]]; then
-  echo "Build did not complete within the expected time."
+  echo "Build did not complete successfully."
   echo "Current status: ${FINAL_STATUS}"
   echo "Build details:"
-  oc describe "${BUILD_NAME}"
+  oc describe "build/${BUILD_NAME}"
   echo "Build logs:"
-  oc logs "${BUILD_NAME}" --timestamps
+  oc logs "build/${BUILD_NAME}" --timestamps || true
   exit 1
 fi
 

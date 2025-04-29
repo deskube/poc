@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wolf
+  labels:
+    app: wolf
+spec:
+ restartPolicy: OnFailure
+ containers:
+ - name: wolf
+   image: "ghcr.io/games-on-whales/wolf:stable"
+   resources:
+     limits:
+       nvidia.com/gpu: 1
+     requests:
+       memory: "1Gi"
+       cpu: "500m"
