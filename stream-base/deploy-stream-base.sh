@@ -50,6 +50,10 @@ fi
 echo "Applying pod configuration..."
 oc apply -f stream-base-pod.yaml -n $NAMESPACE
 
+# Wait for the pod to be ready
+echo "Waiting for stream-base pod to be ready..."
+oc wait --for=condition=Ready pod/stream-base --timeout=120s
+
 echo ""
 echo "======= Success! ======="
 echo "stream-base service is available in the $NAMESPACE namespace."

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wolf-devel
+  namespace: deskube
+  labels:
+    app: wolf-devel
+spec:
+  containers:
+  - name: wolf-devel
+    image: registry.desku.be/deskube/wolf-devel:latest
+    imagePullPolicy: Always
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: dev
+      mountPath: /dev
+    - name: run
+      mountPath: /run
+    - name: tmp
+      mountPath: /tmp
+    - name: config
+      mountPath: /config
+    env:
+    - name: XDG_RUNTIME_DIR
+      value: "/tmp/sockets"
+    - name: WOLF_LOG_LEVEL
+      value: "INFO"
+    - name: WOLF_CFG_FOLDER
+      value: "/config"
+  volumes:
+  - name: dev
+    hostPath:
+      path: /dev
+  - name: run
+    hostPath:
+      path: /run
+  - name: tmp
+    hostPath:
+      path: /tmp
+  - name: config
+    hostPath:
+      path: /home/epheo/wolf-config

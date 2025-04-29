@@ -45,7 +45,8 @@ else
     "${GIT_REPO}#${GIT_BRANCH}" \
     --to="${REGISTRY_IMAGE}" \
     --strategy=docker \
-    --to-docker=true
+    --to-docker=true \
+    --context-dir="stream-base"
 fi
 
 
