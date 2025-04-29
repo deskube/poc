@@ -6,46 +6,21 @@ metadata:
   labels:
     app: stream-base
 spec:
-  serviceAccountName: stream-base-sa
   restartPolicy: OnFailure
   containers:
   - name: stream-base
     image: "registry.desku.be/deskube/streamer-base:latest"
     imagePullPolicy: Always
-    ports:
-    - name: rtp1
-      containerPort: 48100
-      protocol: UDP
-    - name: rtp2
-      containerPort: 48200
-      protocol: UDP
-    - name: rtsp
-      containerPort: 48010
-      protocol: TCP
-    - name: http
-      containerPort: 47989
-      protocol: TCP
-    - name: control
-      containerPort: 47999
-      protocol: TCP
-    - name: https
-      containerPort: 47984
-      protocol: TCP
-    - name: sunshine
-      containerPort: 47990
-      protocol: TCP
-    securityContext:
-      privileged: true
     env:
-    - name: NVIDIA_VISIBLE_DEVICES
-      value: "all"
-    - name: NVIDIA_DRIVER_CAPABILITIES
-      value: "graphics,compute,video,utility"
+    - name: RECEIVER_IP
+      valueFrom:
+        configMapKeyRef:
+          name: stream-base-config
+          key: receiver_ip
     - name: XDG_RUNTIME_DIR
       value: "/tmp/xdg-runtime-dir"
     resources:
       limits:
-        nvidia.com/gpu: "1"
         cpu: "500m"
         memory: "1Gi"
       requests:

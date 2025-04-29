@@ -5,20 +5,8 @@ This project provides a proof-of-concept implementation for running desktop envi
 ## Components
 
 - **run-wayland-display.sh**: Sets up a virtual Wayland display using GStreamer
-- **start-sunshine.sh**: Configures and starts the Sunshine streaming server
-- **apps.json**: Defines applications that can be launched in the virtual desktop
 - **Dockerfile**: Container definition with all necessary components
 - **stream-base-*.yaml**: Kubernetes manifests for deployment
-- **weston.ini**: Configuration for the Weston Wayland compositor
-
-## Sunshine Configuration
-
-The Sunshine server is configured in `start-sunshine.sh` with settings for:
-
-- Video encoding (NVENC by default)
-- Frame rate and bitrate
-- Audio configuration
-- Network settings
 
 ## Architecture
 
@@ -27,34 +15,16 @@ The Sunshine server is configured in `start-sunshine.sh` with settings for:
 - **Streaming Layer**: Sunshine captures the display and streams it to remote clients
 - **Kubernetes Layer**: MetalLB provides external access to the streaming services
 
-## MetalLB Configuration
+## Deploy streamer
 
-MetalLB is used to provide external access to the streaming services running in Kubernetes. The configuration consists of:
-
-**IP Address Pool**:
-
-```yaml
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: ip-addresspool
-  namespace: metallb-system
-spec:
-  addresses:
-  - 192.168.0.1-192.168.0.100 # Replace by your IP range
+```bash
+./deploy-stream-base.sh
 ```
 
-**L2 Advertisement**:
+## Receiver command
 
-```yaml
-apiVersion: metallb.io/v1beta1
-kind: L2Advertisement
-metadata:
-  name: l2-advertisement
-  namespace: metallb-system
-spec:
-  ipAddressPools:
-  - ip-addresspool
+```bash
+gst-launch-1.0 -v udpsrc port=5000 caps="application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)RAW, sampling=(string)RGB, depth=(string)8, width=(string)1920, height=(string)1080" ! rtpvrawdepay ! videoconvert ! autovideosink
 ```
 
 ## Working with private registry
@@ -68,7 +38,3 @@ oc secrets link builder registry-pull-secret --for=pull,mount
 
 This project is licensed under the Apache License, Version 2.0. 
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-
-## Credits
-
-- [Sunshine](https://github.com/LizardByte/Sunshine)
