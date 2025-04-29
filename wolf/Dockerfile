@@ -1,5 +1,6 @@
 FROM registry.desku.be/deskube/streamer-base:latest
 
+# Install dependencies
 RUN dnf install -y \
     curl \
     ca-certificates \
@@ -18,12 +19,21 @@ RUN dnf install -y \
     libunwind-devel \
     systemd-devel \
     libdrm-devel \
-    pciutils-devel 
+    pciutils-devel && \
+    dnf clean all
 
+# Clone Wolf source code
+WORKDIR /usr/src
+RUN git clone https://github.com/games-on-whales/wolf.git
+WORKDIR /usr/src/wolf
+
+# Build wolf
 RUN cmake -Bbuild -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_EXTENSIONS=OFF -G Ninja
 RUN ninja -C build
 
-ADD runwolf.sh /local/bin/runwolf.sh
+# Copy the run script
+COPY runwolf.sh /usr/local/bin/runwolf.sh
 
-RUN chmod +x /local/bin/runwolf.sh
-CMD ["/local/bin//runwolf.sh"]
+# Set up permissions and default command
+RUN chmod +x /usr/local/bin/runwolf.sh
+CMD ["/usr/local/bin/runwolf.sh"]
