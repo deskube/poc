@@ -1,4 +1,4 @@
-FROM fedora:41
+FROM registry.fedoraproject.org/fedora:41
 
 # Install NVIDIA container toolkit
 RUN curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo | \
