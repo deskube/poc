@@ -1,0 +1,22 @@
+{
+  "env": {
+    "PATH": "/usr/local/bin:/usr/bin:/bin",
+    "XDG_RUNTIME_DIR": "/tmp/xdg-runtime-dir",
+    "WAYLAND_DISPLAY": "wayland-1",
+    "XDG_SESSION_TYPE": "wayland"
+  },
+  "apps": [
+    {
+      "name": "Weston Terminal",
+      "cmd": "WAYLAND_DISPLAY=wayland-1 weston-terminal --maximize",
+      "image-path": "/usr/share/sunshine/assets/desktop.png",
+      "detached": true
+    },
+    {
+      "name": "GStreamer Test Pattern",
+      "cmd": "WAYLAND_DISPLAY=wayland-1 gst-launch-1.0 videotestsrc ! waylandsink",
+      "image-path": "/usr/share/sunshine/assets/desktop.png",
+      "detached": true
+    }
+  ]
+}
